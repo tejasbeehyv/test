@@ -16,15 +16,18 @@ jobs:
       - name: Read and parse metadata.json
         id: parse_json
         run: |
-          # Read the metadata.json file
+          sudo apt-get install jq
+          
+          # Read and parse the JSON file
           METADATA=$(cat metadata.json)
 
-          # Extract the service names from the JSON keys
+          # Use jq to access the keys
           SERVICES=$(echo $METADATA | jq -r 'keys[]')
 
-          # Create matrix by iterating over the services and their parameters
+          # Initialize an empty matrix
           MATRIX=""
 
+          # Iterate over the services and extract their properties
           for SERVICE in $SERVICES; do
             DB_PATH=$(echo $METADATA | jq -r ".${SERVICE}.db_migration_dockerfile_path")
             DOCKER_PATH=$(echo $METADATA | jq -r ".${SERVICE}.dockerfile_path")
@@ -36,11 +39,15 @@ jobs:
             MATRIX+="{\"service\":\"$SERVICE\",\"db_migration_dockerfile_path\":\"$DB_PATH\",\"dockerfile_path\":\"$DOCKER_PATH\",\"service_source_path\":\"$SOURCE_PATH\",\"java_version\":\"$JAVA_VERSION\",\"ssl_request\":\"$SSL_REQUEST\"},"
           done
 
-          # Remove the trailing comma and wrap it in brackets to make it valid JSON
+          # Remove the trailing comma and wrap the matrix in brackets to make it valid JSON
           MATRIX="[${MATRIX%?}]"
 
+          # Print the matrix for debugging
           echo "Matrix: $MATRIX"
+
+          # Set the matrix as an output
           echo "::set-output name=matrix::$MATRIX"
+
 
   build:
     needs: setup

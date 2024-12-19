@@ -41,4 +41,4 @@ jobs:
       - name: Set service-specific parameters
         run: |
           echo "Service: ${{ matrix.service }}"
-          echo (jq '.[${{ matrix.service }}].db_migration_dockerfile_path' metadata.json)"
+          echo $(jq '.[${{ matrix.service }}].db_migration_dockerfile_path' metadata.json)"

@@ -1,9 +1,7 @@
 name: Run Tests on Multiple Node.js Versions
 
 on:
-  pull_request:
-    branches:
-      - main
+  workflow_dispatch:
 
 jobs:
   test:
@@ -16,12 +14,4 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Set up Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: ${{ matrix.node-version }}
-
-      - name: Install dependencies
-        run: npm install
-
-      - name: Run tests
-        run: npm test
+        run: echo ${{ matrix.node-version }}

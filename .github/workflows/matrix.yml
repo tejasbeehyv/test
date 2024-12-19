@@ -18,29 +18,7 @@ jobs:
         run: |
           sudo apt-get install jq
           
-          # Read and parse the JSON file
-          METADATA=$(cat metadata.json)
-
-          # Use jq to access the keys
-          SERVICES=$(echo $METADATA | jq -r 'keys[]')
-
-          # Initialize an empty matrix
-          MATRIX=""
-
-          # Iterate over the services and extract their properties
-          for SERVICE in $SERVICES; do
-            DB_PATH=$(jq --arg SERVICE "$SERVICE" '.[$SERVICE].db_migration_dockerfile_path' metadata.json)
-            DOCKER_PATH=$(jq --arg SERVICE "$SERVICE" '.[$SERVICE].dockerfile_path' metadata.json)
-            SOURCE_PATH=$(jq --arg SERVICE "$SERVICE" '.[$SERVICE].service_source_path' metadata.json)
-            JAVA_VERSION=$(jq --arg SERVICE "$SERVICE" '.[$SERVICE].java_version' metadata.json)
-            SSL_REQUEST=$(jq --arg SERVICE "$SERVICE" '.[$SERVICE].ssl_request' metadata.json)
-
-            # Format each service as an object for the matrix
-            MATRIX+="{\"service\":\"$SERVICE\",\"db_migration_dockerfile_path\":\"$DB_PATH\",\"dockerfile_path\":\"$DOCKER_PATH\",\"service_source_path\":\"$SOURCE_PATH\",\"java_version\":\"$JAVA_VERSION\",\"ssl_request\":\"$SSL_REQUEST\"},"
-          done
-
-          # Remove the trailing comma and wrap the matrix in brackets to make it valid JSON
-          MATRIX="[${MATRIX%?}]"
+          MATRIX=$(jq 'keys' metadata.json)
 
           # Print the matrix for debugging
           echo "Matrix: $MATRIX"
@@ -63,7 +41,4 @@ jobs:
       - name: Set service-specific parameters
         run: |
           echo "Service: ${{ matrix.service }}"
-          echo "Dockerfile Path: ${{ matrix.dockerfile_path }}"
-          echo "Service Source Path: ${{ matrix.service_source_path }}"
-          echo "Java Version: ${{ matrix.java_version }}"
-          echo "SSL Request: ${{ matrix.ssl_request }}"
+          echo (jq '.[${{ matrix.service }}].db_migration_dockerfile_path' metadata.json)"

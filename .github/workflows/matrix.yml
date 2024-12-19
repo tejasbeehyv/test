@@ -39,6 +39,8 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Set service-specific parameters
+        if: |
+          contains(join(github.event.head_commit.modified, ','), 'metadata.json')
         run: |
           echo "Service: ${{ matrix.service }}"
           echo $(jq '.["${{ matrix.service }}"].db_migration_dockerfile_path' metadata.json)

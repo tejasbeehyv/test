@@ -1,0 +1,18 @@
+{
+   "dashboard-analytics": {
+      "db_migration_dockerfile_path": "",
+      "dockerfile_path": "build/maven/Dockerfile",
+      "service_source_path": "business-services/dashboard-analytics",
+      "ssl_certificate_url": "",
+      "java_version": "17",
+      "ssl_request": "false"
+   },
+   "dfs-advisory-service": {
+      "db_migration_dockerfile_path": "dfs-services/dfs-advisory-service/src/main/resources/db",
+      "dockerfile_path": "build/maven/Dockerfile",
+      "service_source_path": "dfs-services/dfs-advisory-service",
+      "ssl_certificate_url": "",
+      "java_version": "17",
+      "ssl_request": "false"
+   }
+}

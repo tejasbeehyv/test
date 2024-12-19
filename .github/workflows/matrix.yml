@@ -1,17 +1,62 @@
-name: Run Tests on Multiple Node.js Versions
+name: Build and Test Multiple Services
 
 on:
   workflow_dispatch:
 
 jobs:
-  test:
+  setup:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Read and parse metadata.json
+        id: parse_json
+        run: |
+          # Read the metadata.json file
+          METADATA=$(cat metadata.json)
+
+          # Extract the service names from the JSON keys
+          SERVICES=$(echo $METADATA | jq -r 'keys[]')
+
+          # Create matrix by iterating over the services and their parameters
+          MATRIX=""
+
+          for SERVICE in $SERVICES; do
+            DB_PATH=$(echo $METADATA | jq -r ".${SERVICE}.db_migration_dockerfile_path")
+            DOCKER_PATH=$(echo $METADATA | jq -r ".${SERVICE}.dockerfile_path")
+            SOURCE_PATH=$(echo $METADATA | jq -r ".${SERVICE}.service_source_path")
+            JAVA_VERSION=$(echo $METADATA | jq -r ".${SERVICE}.java_version")
+            SSL_REQUEST=$(echo $METADATA | jq -r ".${SERVICE}.ssl_request")
+
+            # Format each service as an object for the matrix
+            MATRIX+="{\"service\":\"$SERVICE\",\"db_migration_dockerfile_path\":\"$DB_PATH\",\"dockerfile_path\":\"$DOCKER_PATH\",\"service_source_path\":\"$SOURCE_PATH\",\"java_version\":\"$JAVA_VERSION\",\"ssl_request\":\"$SSL_REQUEST\"},"
+          done
+
+          # Remove the trailing comma and wrap it in brackets to make it valid JSON
+          MATRIX="[${MATRIX%?}]"
+
+          echo "Matrix: $MATRIX"
+          echo "::set-output name=matrix::$MATRIX"
+
+  build:
+    needs: setup
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: [14, 16, 18]  # Matrix will create jobs for each version
+        service: ${{fromJson(needs.setup.outputs.matrix)}}
+
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v2
 
-      - name: Set up Node.js
-        run: echo ${{ matrix.node-version }}
+      - name: Set service-specific parameters
+        run: |
+          echo "Service: ${{ matrix.service }}"
+          echo "Dockerfile Path: ${{ matrix.dockerfile_path }}"
+          echo "Service Source Path: ${{ matrix.service_source_path }}"
+          echo "Java Version: ${{ matrix.java_version }}"
+          echo "SSL Request: ${{ matrix.ssl_request }}"

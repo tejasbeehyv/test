@@ -18,7 +18,7 @@ jobs:
         run: |
           sudo apt-get install jq
           
-          MATRIX=$(jq 'keys' metadata.json)
+          MATRIX=$(jq -c 'keys' metadata.json)
 
           # Print the matrix for debugging
           echo "Matrix: $MATRIX"

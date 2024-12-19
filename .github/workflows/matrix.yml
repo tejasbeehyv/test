@@ -29,11 +29,11 @@ jobs:
 
           # Iterate over the services and extract their properties
           for SERVICE in $SERVICES; do
-            DB_PATH=$(echo $METADATA | jq -r ".${SERVICE}.db_migration_dockerfile_path")
-            DOCKER_PATH=$(echo $METADATA | jq -r ".${SERVICE}.dockerfile_path")
-            SOURCE_PATH=$(echo $METADATA | jq -r ".${SERVICE}.service_source_path")
-            JAVA_VERSION=$(echo $METADATA | jq -r ".${SERVICE}.java_version")
-            SSL_REQUEST=$(echo $METADATA | jq -r ".${SERVICE}.ssl_request")
+            DB_PATH=$(jq --arg SERVICE "$SERVICE" '.[$SERVICE].db_migration_dockerfile_path' metadata.json)
+            DOCKER_PATH=$(jq --arg SERVICE "$SERVICE" '.[$SERVICE].dockerfile_path' metadata.json)
+            SOURCE_PATH=$(jq --arg SERVICE "$SERVICE" '.[$SERVICE].service_source_path' metadata.json)
+            JAVA_VERSION=$(jq --arg SERVICE "$SERVICE" '.[$SERVICE].java_version' metadata.json)
+            SSL_REQUEST=$(jq --arg SERVICE "$SERVICE" '.[$SERVICE].ssl_request' metadata.json)
 
             # Format each service as an object for the matrix
             MATRIX+="{\"service\":\"$SERVICE\",\"db_migration_dockerfile_path\":\"$DB_PATH\",\"dockerfile_path\":\"$DOCKER_PATH\",\"service_source_path\":\"$SOURCE_PATH\",\"java_version\":\"$JAVA_VERSION\",\"ssl_request\":\"$SSL_REQUEST\"},"

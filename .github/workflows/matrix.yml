@@ -7,7 +7,7 @@ jobs:
   setup:
     runs-on: ubuntu-latest
     outputs:
-      matrix: ${{ steps.set-matrix.outputs.matrix }}
+      matrix: ${{ steps.parse_json.outputs.matrix }}
 
     steps:
       - name: Checkout code
@@ -46,7 +46,7 @@ jobs:
           echo "Matrix: $MATRIX"
 
           # Set the matrix as an output
-          echo "::set-output name=matrix::$MATRIX"
+          echo "matrix=$MATRIX" >> $GITHUB_OUTPUT
 
 
   build:

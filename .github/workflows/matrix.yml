@@ -22,19 +22,26 @@ jobs:
 
           MATRIX=""
           CHANGED_SERVICES=()
+          if [[ "${GITHUB_EVENT_NAME}" == "workflow_dispatch" ]]; then
+            echo "Manual trigger detected. Including all services in the matrix."
+            # Include all services if it's a manual trigger
+            CHANGED_SERVICES=($SERVICES)
+          else
+            # Loop through services and check for changes if it's not a manual trigger
+            for service in $SERVICES; do
+              SERVICE_PATH=$(jq -r ".\"$service\".service_source_path" $METADATA_FILE)
 
-          for service in $SERVICES; do
-            SERVICE_PATH=$(jq -r ".\"$service\".service_source_path" $METADATA_FILE)
-
-            if git diff --quiet HEAD^ HEAD -- "$SERVICE_PATH"; then
-              echo "No changes in $SERVICE_PATH. Skipping..."
-            else
-              echo "Changes detected in $SERVICE_PATH. Adding $service to matrix..."
-              
-              # Add service name to the list of changed services
-              CHANGED_SERVICES+=("$service")
-            fi
-          done
+              # Check if there are changes in the SERVICE_PATH directory
+              if git diff --quiet HEAD^ HEAD -- "$SERVICE_PATH"; then
+                echo "No changes in $SERVICE_PATH. Skipping..."
+              else
+                echo "Changes detected in $SERVICE_PATH. Adding $service to matrix..."
+                
+                # Add service name to the list of changed services
+                CHANGED_SERVICES+=("$service")
+              fi
+            done
+          fi
 
           # Check if any services were added to the matrix
           if [ ${#CHANGED_SERVICES[@]} -gt 0 ]; then

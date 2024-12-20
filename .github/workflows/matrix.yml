@@ -4,74 +4,22 @@ on:
   push:
     branches:
       - main
+  pull_request:
+    branches:
+      - main    
   workflow_dispatch:
 
 jobs:
-  setup:
-    runs-on: ubuntu-latest
-    outputs:
-      matrix: ${{ steps.parse_json.outputs.matrix }}
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Read and parse metadata.json
-        id: parse_json
-        run: |
-          sudo apt-get install jq
-          
-          SERVICES=$(jq -c 'keys' metadata.json)
-
-          MATRIX=""
-          CHANGED_SERVICES=()
-          if [[ "${GITHUB_EVENT_NAME}" == "workflow_dispatch" ]]; then
-            echo "Manual trigger detected. Including all services in the matrix."
-            # Include all services if it's a manual trigger
-            CHANGED_SERVICES=($SERVICES)
-          else
-            for SERVICE in $SERVICES; do
-              SERVICE_PATH=$(jq --arg SERVICE "$SERVICE" '.[$SERVICE].service_source_path' metadata.json)
-
-              echo $SERVICE_PATH
-              if git diff --quiet HEAD^ HEAD -- "$SERVICE_PATH"; then
-                echo "No changes in $SERVICE_PATH. Skipping..."
-              else
-                echo "Changes detected in $SERVICE_PATH. Adding $service to matrix..."
-                
-                # Add service name to the list of changed services
-                CHANGED_SERVICES+=("$SERVICE")
-              fi
-            done
-            if [ ${#CHANGED_SERVICES[@]} -gt 0 ]; then
-              MATRIX="[\"${CHANGED_SERVICES[*]// /\",\"}\"]"
-              echo "Matrix: $MATRIX"
-            else
-              echo "No services with changes found. Skipping build."
-              MATRIX=""
-            fi
-            echo "Matrix: $MATRIX"
-            echo "matrix=$MATRIX" >> $GITHUB_OUTPUT
-          fi
-
-          # Print the matrix for debugging
-          echo "Matrix: $SERVICES"
-          echo "matrix=$SERVICES" >> $GITHUB_OUTPUT
 
 
   build:
-    needs: setup
     runs-on: ubuntu-latest
-    if: ${{ needs.setup.outputs.matrix != '[]' }}
-    strategy:
-      matrix:
-        service: ${{fromJson(needs.setup.outputs.matrix)}}
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
 
       - name: Set service-specific parameters
-        run: |
-          echo "Service: ${{ matrix.service }}"
-          echo $(jq '.["${{ matrix.service }}"].db_migration_dockerfile_path' metadata.json)
+        if: |
+          contains(join(github.event.head_commit.modified, ','), 'test/something')
+        run: echo "running 1"

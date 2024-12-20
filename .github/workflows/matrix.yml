@@ -19,6 +19,9 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
+      - name: sasdf
+        run: echo ${{ github.event.head_commit.modified }}
+        
       - name: Set service-specific parameters
-        if: contains(join(github.event.head_commit.modified, ','), 'something')
+        if: contains(join(github.event.head_commit.modified, ','), 'something/')
         run: echo "running 1"

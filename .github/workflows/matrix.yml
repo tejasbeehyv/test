@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       packages: ${{ steps.filter.outputs.changes }}
-      services: ${{ steps.asdfasdf.outputs.services }}
+      services: ${{ steps.tejas.outputs.services }}
     steps:
     - uses: actions/checkout@v4
     - uses: dorny/paths-filter@v3
@@ -23,7 +23,7 @@ jobs:
         filters: |
           something: 'something/**'
     - name: asdfasdf
-      id: asdfasdf
+      id: tejas
       run: |
         SERVICES=[]
         SERVICES=${{ steps.filter.outputs.changes }}
@@ -31,7 +31,7 @@ jobs:
         echo "services=$SERVICES" >> $GITHUB_OUTPUT
     - name: asdfadasdasdf
       run: |
-        echo ${{ steps.filter.outputs.services }}
+        echo ${{ steps.tejas.outputs.services }}
           
           
   build:

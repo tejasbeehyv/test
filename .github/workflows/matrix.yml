@@ -55,7 +55,7 @@ jobs:
   build:
     needs: setup
     runs-on: ubuntu-latest
-    if: ${{ fromJson(needs.setup.outputs.matrix) != '[]' }}
+    if: false
     strategy:
       matrix:
         service: ${{fromJson(needs.setup.outputs.matrix)}}

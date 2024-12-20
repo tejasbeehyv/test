@@ -30,18 +30,17 @@ jobs:
             # Include all services if it's a manual trigger
             CHANGED_SERVICES=($SERVICES)
           else
-            # Loop through services and check for changes if it's not a manual trigger
-            for service in $SERVICES; do
-              SERVICE_PATH=$(jq -r ".\"$service\".service_source_path" $METADATA_FILE)
+            for SERVICE in $SERVICES; do
+              SERVICE_PATH=$(jq --arg SERVICE "$SERVICE" '.[$SERVICE].service_source_path' metadata.json)
 
-              # Check if there are changes in the SERVICE_PATH directory
+              echo $SERVICE_PATH
               if git diff --quiet HEAD^ HEAD -- "$SERVICE_PATH"; then
                 echo "No changes in $SERVICE_PATH. Skipping..."
               else
                 echo "Changes detected in $SERVICE_PATH. Adding $service to matrix..."
                 
                 # Add service name to the list of changed services
-                CHANGED_SERVICES+=("$service")
+                CHANGED_SERVICES+=("$SERVICE")
               fi
             done
             if [ ${#CHANGED_SERVICES[@]} -gt 0 ]; then

@@ -1,6 +1,9 @@
 name: Build and Test Multiple Services
 
 on:
+  push:
+    branches:
+      - main
   workflow_dispatch:
 
 jobs:

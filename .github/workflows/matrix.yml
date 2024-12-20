@@ -12,8 +12,6 @@ on:
 jobs:
   changes:
     runs-on: ubuntu-latest
-    permissions:
-      pull-requests: read
     outputs:
       packages: ${{ steps.filter.outputs.changes }}
     steps:
@@ -22,7 +20,6 @@ jobs:
       with:
         filters: |
           something: 'something/**'
-          package2: src/package2
           
   build:
     runs-on: ubuntu-latest

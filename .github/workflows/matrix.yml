@@ -24,11 +24,11 @@ jobs:
           
   build:
     runs-on: ubuntu-latest
-    if:  ${{ needs.changes.outputs.packages != '' }}
+    # if:  ${{ needs.changes.outputs.packages != '' }}
     needs: changes
-    strategy:
-      matrix:
-        package: ${{ fromJSON(needs.changes.outputs.packages) }}
+    # strategy:
+    #   matrix:
+    #     package: ${{ fromJSON(needs.changes.outputs.packages) }}
     steps:
       - name: sasdf
         run: echo "Building and testing ${{ matrix.package }}"

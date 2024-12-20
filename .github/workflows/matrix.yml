@@ -25,10 +25,15 @@ jobs:
     - name: asdfasdf
       id: tejas
       run: |
-        SERVICES=[]
-        SERVICES=${{ steps.filter.outputs.changes }}
-        echo $SERVICES
-        echo "services=$SERVICES" >> $GITHUB_OUTPUT
+        sudo apt-get install jq
+        if [ ${{ steps.filter.outputs.changes }} != '[]' ]; then
+            echo "services=${{ steps.filter.outputs.changes }}" >> $GITHUB_OUTPUT
+        else
+            SERVICES=$(jq -c 'keys' build/config.json)
+            # Set the matrix as an output
+            echo "services=$SERVICES" >> $GITHUB_OUTPUT
+        fi
+          
     - name: asdfadasdasdf
       run: |
         echo ${{ steps.tejas.outputs.services }}
@@ -37,10 +42,10 @@ jobs:
   build:
     runs-on: ubuntu-latest
     needs: changes
-    if: ${{ needs.changes.outputs.packages != '[]' }}
+    if: ${{ needs.changes.outputs.services != '[]' }}
     strategy:
       matrix:
-        package: ${{ fromJSON(needs.changes.outputs.packages) }}
+        package: ${{ fromJSON(needs.changes.outputs.services) }}
     steps:
       - name: sasdf
         run: echo "Building and testing${{ matrix.package }}"

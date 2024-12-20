@@ -20,6 +20,31 @@ jobs:
           
           MATRIX=$(jq -c 'keys' metadata.json)
 
+          MATRIX=""
+          CHANGED_SERVICES=()
+
+          for service in $SERVICES; do
+            SERVICE_PATH=$(jq -r ".\"$service\".service_source_path" $METADATA_FILE)
+
+            if git diff --quiet HEAD^ HEAD -- "$SERVICE_PATH"; then
+              echo "No changes in $SERVICE_PATH. Skipping..."
+            else
+              echo "Changes detected in $SERVICE_PATH. Adding $service to matrix..."
+              
+              # Add service name to the list of changed services
+              CHANGED_SERVICES+=("$service")
+            fi
+          done
+
+          # Check if any services were added to the matrix
+          if [ ${#CHANGED_SERVICES[@]} -gt 0 ]; then
+            MATRIX="[\"${CHANGED_SERVICES[*]// /\",\"}\"]"
+            echo "Matrix: $MATRIX"
+          else
+            echo "No services with changes found. Skipping build."
+            MATRIX="[]"
+          fi
+          
           # Print the matrix for debugging
           echo "Matrix: $MATRIX"
 
@@ -30,8 +55,6 @@ jobs:
   build:
     needs: setup
     runs-on: ubuntu-latest
-    if: |
-      contains(join(github.event.head_commit.modified, ','), 'metadata.json')
     strategy:
       matrix:
         service: ${{fromJson(needs.setup.outputs.matrix)}}

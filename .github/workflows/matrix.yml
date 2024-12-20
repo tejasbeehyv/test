@@ -29,7 +29,7 @@ jobs:
         if [ ${{ steps.filter.outputs.changes }} != '[]' ]; then
             echo "services=${{ steps.filter.outputs.changes }}" >> $GITHUB_OUTPUT
         else
-            SERVICES=$(jq -c 'keys' build/config.json)
+            SERVICES=$(jq -c 'keys' metadata.json)
             # Set the matrix as an output
             echo "services=$SERVICES" >> $GITHUB_OUTPUT
         fi

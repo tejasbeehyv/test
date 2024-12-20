@@ -31,7 +31,6 @@ jobs:
           
   build:
     runs-on: ubuntu-latest
-    if:  ${{ needs.changes.outputs.services != '' }}
     needs: changes
     strategy:
       matrix:

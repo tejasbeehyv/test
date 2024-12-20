@@ -14,6 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       packages: ${{ steps.filter.outputs.changes }}
+      services: ${{ steps.asdfasdf.outputs.services }}
     steps:
     - uses: actions/checkout@v4
     - uses: dorny/paths-filter@v3
@@ -21,15 +22,21 @@ jobs:
       with:
         filters: |
           something: 'something/**'
+    - name: asdfasdf
+      run: |
+        SERVICES=""
+        SERVICES=${{ steps.filter.outputs.changes }}
+        echo $SERVICES
+        echo "services=$SERVICES" >> $GITHUB_OUTPUT
           
   build:
     runs-on: ubuntu-latest
-    if:  ${{ needs.changes.outputs.packages != '' }}
+    if:  ${{ needs.changes.outputs.services != '' }}
     needs: changes
     strategy:
       matrix:
-        package: ${{ fromJSON(needs.changes.outputs.packages) }}
+        package: ${{ fromJSON(needs.changes.outputs.services) }}
     steps:
       - name: sasdf
-        run: echo "Building and testing${{ matrix.package }}"
+        run: echo "Building and testing${{ matrix.services }}"
         

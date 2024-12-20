@@ -24,7 +24,7 @@ jobs:
           something: 'something/**'
     - name: asdfasdf
       run: |
-        SERVICES=""
+        SERVICES=[]
         SERVICES=${{ steps.filter.outputs.changes }}
         echo $SERVICES
         echo "services=$SERVICES" >> $GITHUB_OUTPUT

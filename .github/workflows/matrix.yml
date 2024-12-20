@@ -27,7 +27,7 @@ jobs:
       run: |
         sudo apt-get install jq
         if [ ${{ steps.filter.outputs.changes }} != '[]' ]; then
-            echo "services=${{ steps.filter.outputs.changes }}" >> $GITHUB_OUTPUT
+            echo "services=${{ fromJSON(steps.filter.outputs.changes) }}" >> $GITHUB_OUTPUT
         else
             SERVICES=$(jq -c 'keys' metadata.json)
             # Set the matrix as an output

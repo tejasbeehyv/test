@@ -37,6 +37,7 @@ jobs:
     - name: asdfadasdasdf
       run: |
         echo ${{ steps.tejas.outputs.services }}
+        echo ${{ steps.filter.outputs.changes }}
           
           
   build:

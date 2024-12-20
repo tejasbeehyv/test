@@ -41,22 +41,20 @@ jobs:
                 CHANGED_SERVICES+=("$service")
               fi
             done
-          fi
-
-          # Check if any services were added to the matrix
-          if [ ${#CHANGED_SERVICES[@]} -gt 0 ]; then
-            MATRIX="[\"${CHANGED_SERVICES[*]// /\",\"}\"]"
+            if [ ${#CHANGED_SERVICES[@]} -gt 0 ]; then
+              MATRIX="[\"${CHANGED_SERVICES[*]// /\",\"}\"]"
+              echo "Matrix: $MATRIX"
+            else
+              echo "No services with changes found. Skipping build."
+              MATRIX=""
+            fi
             echo "Matrix: $MATRIX"
-          else
-            echo "No services with changes found. Skipping build."
-            MATRIX="[]"
+            echo "matrix=$MATRIX" >> $GITHUB_OUTPUT
           fi
-          
-          # Print the matrix for debugging
-          echo "Matrix: $MATRIX"
 
-          # Set the matrix as an output
-          echo "matrix=$MATRIX" >> $GITHUB_OUTPUT
+          # Print the matrix for debugging
+          echo "Matrix: $SERVICES"
+          echo "matrix=$SERVICES" >> $GITHUB_OUTPUT
 
 
   build:

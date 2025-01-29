@@ -1,4 +1,5 @@
-name: Schedule ${{ github.event_name == 'schedule' && github.event.schedule == '*/10 * * * *' && 'stop' || 'default' }}
+name: Schedule Job
+run-name: Test ${{ github.event_name == 'schedule' && github.event.schedule == '*/10 * * * *' && 'stop' || 'default' }}
 
 on:
   schedule:

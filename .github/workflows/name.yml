@@ -3,11 +3,7 @@ run-name: Test ${{ github.event_name == 'schedule' && github.event.schedule == '
 
 on:
   schedule:
-    - cron: '*/10 * * * *'
-  push:
-    branches:
-      - main
-
+    - cron: '*/5 * * * *'
 jobs:
   example-job:
     runs-on: ubuntu-latest
